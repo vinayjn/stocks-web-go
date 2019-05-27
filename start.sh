@@ -1,3 +1,3 @@
 go install;
 
-./../../bin/stocks;
+$GOPATH/bin/stocks;
