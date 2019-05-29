@@ -1,7 +1,6 @@
 package handlers
 
-import (	
-	"fmt"
+import (		
 	"strings"
 	"net/http"
 	"io/ioutil"		
@@ -25,5 +24,17 @@ func SearchStocks(w http.ResponseWriter, r *http.Request) {
 	obj := models.SymbolSearchResponse{}	
 	jsonpb.Unmarshal(strings.NewReader(string(resp_body)), &obj)
 	data, _ := proto.Marshal(&obj)
-	k, _ := w.Write(data)	
+	w.Write(data)	
+}
+
+// QuoteStocks find quotes for stocks 
+func QuoteStocks(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	response, _ := utils.MakeGETCall("GLOBAL_QUOTE", map[string]string{"symbol": strings.Join(r.Form["symbol"], "")})
+	defer response.Body.Close()	
+	resp_body, _ := ioutil.ReadAll(response.Body)	
+	obj := models.StockQuoteResponse{}	
+	jsonpb.Unmarshal(strings.NewReader(string(resp_body)), &obj)
+	data, _ := proto.Marshal(&obj)
+	w.Write(data)	
 }
