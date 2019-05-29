@@ -1,15 +1,14 @@
 package utils
 
 import (
-	"fmt"
-	"io/ioutil"
+	"fmt"	
 	"log"
 	"net/http"
 	"net/url"
-	"os"
+	"os"	
 )
 
-func MakeGETCall(endpoint string, params map[string]string) {
+func MakeGETCall(endpoint string, params map[string]string) (*http.Response, error) {
 	apiKey, _ := os.LookupEnv("STOCKS_API_KEY")
 	apiURL, _ := os.LookupEnv("STOCKS_API_BASE_URL")
 
@@ -18,7 +17,7 @@ func MakeGETCall(endpoint string, params map[string]string) {
 
 	if err != nil {
 		log.Print(err)
-		os.Exit(1)
+		return nil, err
 	}
 	req.Header.Add("Accept", "application/json")
 
@@ -30,20 +29,12 @@ func MakeGETCall(endpoint string, params map[string]string) {
 	for key, value := range params {
 		q.Add(key, value)
 	}
-	req.URL.RawQuery = q.Encode()
-	fmt.Println(req.URL)
+	req.URL.RawQuery = q.Encode()	
 	resp, err := client.Do(req)
 
 	if err != nil {
 		fmt.Println("Errored when sending request to the server")
-		return
+		return nil, err
 	}
-
-	defer resp.Body.Close()
-
-	resp_body, _ := ioutil.ReadAll(resp.Body)
-
-	fmt.Println(resp.Status)
-	fmt.Println(string(resp_body))
-
+	return resp, nil
 }
