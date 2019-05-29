@@ -6,9 +6,26 @@ import (
 	"net/http"
 	"net/url"
 	"os"	
+	"errors"
 )
 
-func MakeGETCall(endpoint string, params map[string]string) (*http.Response, error) {
+func CheckSetup() (bool, string) {
+	_, apiKeyPresent := os.LookupEnv("STOCKS_API_KEY")	
+	if !apiKeyPresent {
+		return false, "STOCKS_API_KEY is not set"
+	}
+	_, apiURLPresent := os.LookupEnv("STOCKS_API_BASE_URL")
+	if !apiURLPresent {
+		return false, "STOCKS_API_BASE_URL is not set"
+	}
+	return true, "Success"
+}
+
+func MakeGETCall(endpoint string, params map[string]string) (*http.Response, error) {	
+	success, message := CheckSetup()	
+	if !success {		
+		return nil, errors.New(message)
+	}
 	apiKey, _ := os.LookupEnv("STOCKS_API_KEY")
 	apiURL, _ := os.LookupEnv("STOCKS_API_BASE_URL")
 
@@ -20,8 +37,7 @@ func MakeGETCall(endpoint string, params map[string]string) (*http.Response, err
 		return nil, err
 	}
 	req.Header.Add("Accept", "application/json")
-
-	// or you can create new url.Values struct and encode that like so
+	
 	q := url.Values{}
 	q.Add("apikey", apiKey)
 	q.Add("function", endpoint)

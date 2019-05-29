@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	router.HandleURL()                              // set router
-	err := http.ListenAndServe("0.0.0.0:9090", nil) // set listen port
+	router.HandleURL()
+	err := http.ListenAndServe("0.0.0.0:9090", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

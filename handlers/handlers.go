@@ -12,13 +12,18 @@ import (
 
 // Index says hello
 func Index(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello")) // send data to client side
+	_, message := utils.CheckSetup()	
+	w.Write([]byte(message)) // send data to client side
 }
 
 // SearchStocks searches for stocks which matches the query string
 func SearchStocks(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	response, _ := utils.MakeGETCall("SYMBOL_SEARCH", map[string]string{"keywords": strings.Join(r.Form["keyword"], "")})
+	response, error := utils.MakeGETCall("SYMBOL_SEARCH", map[string]string{"keywords": strings.Join(r.Form["keyword"], "")})
+	if error != nil {
+		w.Write([]byte(string(error.Error())))
+		return
+	}
 	defer response.Body.Close()	
 	resp_body, _ := ioutil.ReadAll(response.Body)	
 	obj := models.SymbolSearchResponse{}	
@@ -30,7 +35,11 @@ func SearchStocks(w http.ResponseWriter, r *http.Request) {
 // QuoteStocks find quotes for stocks 
 func QuoteStocks(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	response, _ := utils.MakeGETCall("GLOBAL_QUOTE", map[string]string{"symbol": strings.Join(r.Form["symbol"], "")})
+	response, error := utils.MakeGETCall("GLOBAL_QUOTE", map[string]string{"symbol": strings.Join(r.Form["symbol"], "")})
+	if error != nil {
+		w.Write([]byte(string(error.Error())))
+		return
+	}
 	defer response.Body.Close()	
 	resp_body, _ := ioutil.ReadAll(response.Body)	
 	obj := models.StockQuoteResponse{}	
