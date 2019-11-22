@@ -1,18 +1,20 @@
 package handlers
 
-import (		
-	"strings"
+import (
+	"fmt"
+	"io/ioutil"
 	"net/http"
-	"io/ioutil"		
-	"stocks/utils"	
 	"stocks/models"
-	"github.com/golang/protobuf/proto"
+	"stocks/utils"
+	"strings"
+
 	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 )
 
 // Index says hello
 func Index(w http.ResponseWriter, r *http.Request) {
-	_, message := utils.CheckSetup()	
+	_, message := utils.CheckSetup()
 	w.Write([]byte(message)) // send data to client side
 }
 
@@ -24,15 +26,16 @@ func SearchStocks(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(string(error.Error())))
 		return
 	}
-	defer response.Body.Close()	
-	resp_body, _ := ioutil.ReadAll(response.Body)	
-	obj := models.SymbolSearchResponse{}	
+	defer response.Body.Close()
+	resp_body, _ := ioutil.ReadAll(response.Body)
+	obj := models.SymbolSearchResponse{}
+	fmt.Print(string(resp_body))
 	jsonpb.Unmarshal(strings.NewReader(string(resp_body)), &obj)
 	data, _ := proto.Marshal(&obj)
-	w.Write(data)	
+	w.Write(data)
 }
 
-// QuoteStocks find quotes for stocks 
+// QuoteStocks find quotes for stocks
 func QuoteStocks(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	response, error := utils.MakeGETCall("GLOBAL_QUOTE", map[string]string{"symbol": strings.Join(r.Form["symbol"], "")})
@@ -40,10 +43,11 @@ func QuoteStocks(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(string(error.Error())))
 		return
 	}
-	defer response.Body.Close()	
-	resp_body, _ := ioutil.ReadAll(response.Body)	
-	obj := models.StockQuoteResponse{}	
+	defer response.Body.Close()
+	resp_body, _ := ioutil.ReadAll(response.Body)
+	obj := models.StockQuoteResponse{}
+	fmt.Print(string(resp_body))
 	jsonpb.Unmarshal(strings.NewReader(string(resp_body)), &obj)
 	data, _ := proto.Marshal(&obj)
-	w.Write(data)	
+	w.Write(data)
 }
