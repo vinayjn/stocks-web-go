@@ -27,10 +27,10 @@ func SearchStocks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer response.Body.Close()
-	resp_body, _ := ioutil.ReadAll(response.Body)
+	respBody, _ := ioutil.ReadAll(response.Body)
 	obj := models.SymbolSearchResponse{}
-	fmt.Print(string(resp_body))
-	jsonpb.Unmarshal(strings.NewReader(string(resp_body)), &obj)
+	fmt.Print(string(respBody))
+	jsonpb.Unmarshal(strings.NewReader(string(respBody)), &obj)
 	data, _ := proto.Marshal(&obj)
 	w.Write(data)
 }
@@ -44,10 +44,10 @@ func QuoteStocks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer response.Body.Close()
-	resp_body, _ := ioutil.ReadAll(response.Body)
+	respBody, _ := ioutil.ReadAll(response.Body)
 	obj := models.StockQuoteResponse{}
-	fmt.Print(string(resp_body))
-	jsonpb.Unmarshal(strings.NewReader(string(resp_body)), &obj)
+	fmt.Print(string(respBody))
+	jsonpb.Unmarshal(strings.NewReader(string(respBody)), &obj)
 	data, _ := proto.Marshal(&obj)
 	w.Write(data)
 }

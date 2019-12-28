@@ -1,16 +1,17 @@
 package utils
 
 import (
-	"fmt"	
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
-	"os"	
-	"errors"
+	"os"
 )
 
+// CheckSetup checks if the all ennvironment values are set
 func CheckSetup() (bool, string) {
-	_, apiKeyPresent := os.LookupEnv("STOCKS_API_KEY")	
+	_, apiKeyPresent := os.LookupEnv("STOCKS_API_KEY")
 	if !apiKeyPresent {
 		return false, "STOCKS_API_KEY is not set"
 	}
@@ -21,9 +22,10 @@ func CheckSetup() (bool, string) {
 	return true, "Success"
 }
 
-func MakeGETCall(endpoint string, params map[string]string) (*http.Response, error) {	
-	success, message := CheckSetup()	
-	if !success {		
+// MakeGETCall calls a get service for the passed parameters
+func MakeGETCall(endpoint string, params map[string]string) (*http.Response, error) {
+	success, message := CheckSetup()
+	if !success {
 		return nil, errors.New(message)
 	}
 	apiKey, _ := os.LookupEnv("STOCKS_API_KEY")
@@ -37,7 +39,7 @@ func MakeGETCall(endpoint string, params map[string]string) (*http.Response, err
 		return nil, err
 	}
 	req.Header.Add("Accept", "application/json")
-	
+
 	q := url.Values{}
 	q.Add("apikey", apiKey)
 	q.Add("function", endpoint)
@@ -45,7 +47,7 @@ func MakeGETCall(endpoint string, params map[string]string) (*http.Response, err
 	for key, value := range params {
 		q.Add(key, value)
 	}
-	req.URL.RawQuery = q.Encode()	
+	req.URL.RawQuery = q.Encode()
 	resp, err := client.Do(req)
 
 	if err != nil {
